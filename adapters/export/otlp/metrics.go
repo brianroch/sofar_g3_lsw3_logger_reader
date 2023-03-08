@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/kubaceg/sofar_g3_lsw3_logger_reader/adapters/devices/sofar"
+	"go.opentelemetry.io/otel/attribute"
 	grpc "go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	http "go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/metric"
@@ -14,10 +15,16 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.18.0"
 	"log"
+	"time"
 )
 
 const (
-	appName = "sofar.logger"
+	appName     = "sofar.logger"
+	dateAttr    = "date"
+	tariffAttr  = "tariff"
+	tariffDay   = "day"
+	tariffNight = "night"
+	tariffPeak  = "peak"
 )
 
 type Config struct {
@@ -92,7 +99,10 @@ func (s *Service) initGauges() error {
 				func(ctx context.Context, o metric.Observer) error {
 					measurements := sofar.GetLastReading()
 					if v, ok := measurements[name]; ok {
-						o.ObserveInt64(*g, convertToInt64(v))
+						t := time.Now()
+						o.ObserveInt64(*g, convertToInt64(v),
+							attribute.String(dateAttr, t.Format("2006-01-02")),
+							attribute.String(tariffAttr, getTariff(t)))
 					} else {
 						log.Printf("could not find measurement for %s", name)
 					}
@@ -165,5 +175,20 @@ func convertToInt64(v interface{}) int64 {
 	default:
 		fmt.Println("unexpected type encountered")
 		return 0
+	}
+}
+
+func getTariff(t time.Time) string {
+	h := t.Hour()
+	if h < 8 {
+		return tariffNight
+	} else if h < 17 {
+		return tariffDay
+	} else if h < 19 {
+		return tariffPeak
+	} else if h < 23 {
+		return tariffDay
+	} else {
+		return tariffNight
 	}
 }
