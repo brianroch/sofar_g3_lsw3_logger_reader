@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	_ "net/http/pprof"
+	"os"
 	"strings"
 	"time"
 
@@ -21,6 +22,8 @@ import (
 // maximumFailedConnections maximum number failed logger connection, after this number will be exceeded reconnect
 // interval will be extended from 5s to readInterval defined in config file
 const maximumFailedConnections = 3
+const configPathEnvVar = "CONFIG_PATH"
+const defaultConfigPath = "config.yaml"
 
 var (
 	config *Config
@@ -34,8 +37,13 @@ var (
 )
 
 func initialize() {
+	configPath := os.Getenv(configPathEnvVar)
+	if configPath == "" {
+		configPath = defaultConfigPath
+	}
+
 	var err error
-	config, err = NewConfig("config.yaml")
+	config, err = NewConfig(configPath)
 	if err != nil {
 		log.Fatalln(err)
 	}

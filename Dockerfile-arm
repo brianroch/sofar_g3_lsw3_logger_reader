@@ -1,0 +1,22 @@
+FROM --platform=$BUILDPLATFORM golang:1.19.6-alpine3.16 as builder
+
+WORKDIR /build
+
+COPY . .
+
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o ./sofar-arm .
+
+FROM --platform=$BUILDPLATFORM alpine:3.16.4
+
+WORKDIR /
+
+RUN apk upgrade --no-cache --ignore alpine-baselayout --available && \
+   apk --no-cache add ca-certificates tzdata && \
+   rm -rf /var/cache/apk/*
+
+COPY --from=builder /build/sofar-arm .
+RUN mkdir -m 664 /config
+RUN chmod +x sofar-arm
+
+ENTRYPOINT ["/sofar-arm"]

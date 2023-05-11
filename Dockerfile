@@ -4,8 +4,8 @@ WORKDIR /build
 
 COPY . .
 
-RUN go mod download && CGO_ENABLED=0 \
-    env GOOS=linux GOARCH=arm go build -o ./sofar .
+RUN go mod download
+RUN CGO_ENABLED=0 go build -o ./sofar .
 
 FROM alpine:3.16.4
 
