@@ -93,7 +93,7 @@ func (s *Service) initGauges() error {
 			}
 
 			name := f.Name
-			g := s.createGauge(name)
+			g := s.createGauge(name, f.Unit)
 			_, err := s.m.RegisterCallback(
 				// this function is called when a collection is triggered
 				func(ctx context.Context, o metric.Observer) error {
@@ -117,10 +117,10 @@ func (s *Service) initGauges() error {
 	return nil
 }
 
-func (s *Service) createGauge(n string) *instrument.Int64ObservableGauge {
+func (s *Service) createGauge(name string, unit string) *instrument.Int64ObservableGauge {
 	newGauge, _ := s.m.Int64ObservableGauge(
-		appName+"."+n,
-		instrument.WithUnit("1"),
+		appName+"."+name,
+		instrument.WithUnit(unit),
 	)
 	return &newGauge
 }

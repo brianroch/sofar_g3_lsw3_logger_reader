@@ -5,7 +5,7 @@ type field struct {
 	Name      string // Need to read names to create gauges on startup
 	ValueType string
 	factor    string
-	unit      string
+	Unit      string
 }
 
 type registerRange struct {

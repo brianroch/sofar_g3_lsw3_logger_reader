@@ -1,4 +1,4 @@
-IMG_VERSION="0.16.0"
+IMG_VERSION="0.17.0"
 IMG_NAME="ghcr.io/brianroch/sofar-exporter"
 TAG=${IMG_NAME}":"${IMG_VERSION}
 TAG_ARM=${IMG_NAME}":"${IMG_VERSION}"-arm"
