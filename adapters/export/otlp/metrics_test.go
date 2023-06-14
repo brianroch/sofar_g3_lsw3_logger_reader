@@ -35,27 +35,28 @@ func Test_getTariff(t *testing.T) {
 		t time.Time
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name      string
+		args      args
+		wantName  string
+		wantIndex string
 	}{
-		{name: time01Val, args: args{time01}, want: tariffNight},
-		{name: time02Val, args: args{time02}, want: tariffDay},
-		{name: time03Val, args: args{time03}, want: tariffDay},
-		{name: time04Val, args: args{time04}, want: tariffDay},
-		{name: time05Val, args: args{time05}, want: tariffPeak},
-		{name: time06Val, args: args{time06}, want: tariffPeak},
-		{name: time07Val, args: args{time07}, want: tariffDay},
-		{name: time08Val, args: args{time08}, want: tariffDay},
-		{name: time09Val, args: args{time09}, want: tariffDay},
-		{name: time10Val, args: args{time10}, want: tariffDay},
-		{name: time11Val, args: args{time11}, want: tariffNight},
-		{name: time12Val, args: args{time12}, want: tariffNight},
+		{name: time01Val, args: args{time01}, wantName: tariffNight, wantIndex: "0"},
+		{name: time02Val, args: args{time02}, wantName: tariffDay, wantIndex: "0"},
+		{name: time03Val, args: args{time03}, wantName: tariffDay, wantIndex: "0"},
+		{name: time04Val, args: args{time04}, wantName: tariffDay, wantIndex: "0"},
+		{name: time05Val, args: args{time05}, wantName: tariffPeak, wantIndex: "0"},
+		{name: time06Val, args: args{time06}, wantName: tariffPeak, wantIndex: "0"},
+		{name: time07Val, args: args{time07}, wantName: tariffDay, wantIndex: "1"},
+		{name: time08Val, args: args{time08}, wantName: tariffDay, wantIndex: "1"},
+		{name: time09Val, args: args{time09}, wantName: tariffDay, wantIndex: "1"},
+		{name: time10Val, args: args{time10}, wantName: tariffDay, wantIndex: "1"},
+		{name: time11Val, args: args{time11}, wantName: tariffNight, wantIndex: "1"},
+		{name: time12Val, args: args{time12}, wantName: tariffNight, wantIndex: "1"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getTariff(tt.args.t); got != tt.want {
-				t.Errorf("getTariff() = %v, want %v", got, tt.want)
+			if got, i := getTariffNameAndIndex(tt.args.t); got != tt.wantName || i != tt.wantIndex {
+				t.Errorf("getTariffNameAndIndex() = %v, %v, wantName %v, wantIndex %v", got, i, tt.wantName, tt.wantIndex)
 			}
 		})
 	}

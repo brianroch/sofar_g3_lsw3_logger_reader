@@ -19,12 +19,13 @@ import (
 )
 
 const (
-	appName     = "sofar.logger"
-	dateAttr    = "date"
-	tariffAttr  = "tariff"
-	tariffDay   = "day"
-	tariffNight = "night"
-	tariffPeak  = "peak"
+	appName         = "sofar.logger"
+	dateAttr        = "date"
+	tariffAttr      = "tariff"
+	tariffIndexAttr = "tariffIndex"
+	tariffDay       = "day"
+	tariffNight     = "night"
+	tariffPeak      = "peak"
 )
 
 type Config struct {
@@ -100,9 +101,13 @@ func (s *Service) initGauges() error {
 					measurements := sofar.GetLastReading()
 					if v, ok := measurements[name]; ok {
 						t := time.Now()
-						o.ObserveInt64(*g, convertToInt64(v),
+						tariffName, tariffIndex := getTariffNameAndIndex(t)
+						o.ObserveInt64(
+							*g, convertToInt64(v),
 							attribute.String(dateAttr, t.Format("2006-01-02")),
-							attribute.String(tariffAttr, getTariff(t)))
+							attribute.String(tariffAttr, tariffName),
+							attribute.String(tariffIndexAttr, tariffIndex),
+						)
 					} else {
 						log.Printf("could not find measurement for %s", name)
 					}
@@ -178,17 +183,17 @@ func convertToInt64(v interface{}) int64 {
 	}
 }
 
-func getTariff(t time.Time) string {
+func getTariffNameAndIndex(t time.Time) (string, string) {
 	h := t.Hour()
 	if h < 8 {
-		return tariffNight
+		return tariffNight, "0"
 	} else if h < 17 {
-		return tariffDay
+		return tariffDay, "0"
 	} else if h < 19 {
-		return tariffPeak
+		return tariffPeak, "0"
 	} else if h < 23 {
-		return tariffDay
+		return tariffDay, "1"
 	} else {
-		return tariffNight
+		return tariffNight, "1"
 	}
 }
