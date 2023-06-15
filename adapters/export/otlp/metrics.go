@@ -104,7 +104,6 @@ func (s *Service) initGauges() error {
 						tariffName, tariffIndex := getTariffNameAndIndex(t)
 						o.ObserveInt64(
 							*g, convertToInt64(v),
-							attribute.String(dateAttr, t.Format("2006-01-02")),
 							attribute.String(tariffAttr, tariffName),
 							attribute.String(tariffIndexAttr, tariffIndex),
 						)
